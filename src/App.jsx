@@ -1,14 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 
 function App() {
-  const [query, setQuery] = useState("");
-  const [searchString, setSearchString] = useState("");
+  const [deboundQuery, setDeboundQuery] = useState("");
+  const [deboundSearchString, setDeboundSearchString] = useState("");
+  const [throtleSearchString, setThrotleSearchString] = useState("");
+  
 
   const handleChange = (event) => {
-    setQuery(event.target.value);
-    console.log("검색 쿼리:", event.target.value);
+    setDeboundQuery(event.target.value);
   };
+
+  useEffect(()=>{
+    const deboundTimer = setTimeout(()=>{
+    console.log("검색 쿼리:", deboundQuery);
+    },1000);
+    return () => clearTimeout(deboundTimer)
+  },[deboundQuery])
+
+
 
   return (
     <div className="container">
@@ -33,7 +43,9 @@ function App() {
           onChange={handleChange}
         />
       </div>
-      <p>{searchString}</p>
+      <p>{deboundSearchString}</p>
+      <p>{throtleSearchString}</p>
+
     </div>
   );
 }

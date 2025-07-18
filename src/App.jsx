@@ -1,24 +1,40 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 
 function App() {
-  const [deboundQuery, setDeboundQuery] = useState("");
+  const [query, setQuery] = useState("");
+  const [throttleQuery, setThrottleQuery] = useState("");
   const [deboundSearchString, setDeboundSearchString] = useState("");
-  const [throtleSearchString, setThrotleSearchString] = useState("");
-  
+  const [throttleSearchString, setThrottleSearchString] = useState("");
 
-  const handleChange = (event) => {
-    setDeboundQuery(event.target.value);
+  const throttleTime = useRef(new Date());
+
+  const handleChangeDebound = (event) => {
+    setQuery(event.target.value);
+  };
+  const handleChangeThrottle = (event) => {
+    setThrottleQuery(event.target.value);
   };
 
   useEffect(()=>{
     const deboundTimer = setTimeout(()=>{
-    console.log("검색 쿼리:", deboundQuery);
+    console.log("검색 쿼리:", query);
+    setDeboundSearchString(query)
     },1000);
-    return () => clearTimeout(deboundTimer)
-  },[deboundQuery])
+    return () => clearTimeout(deboundTimer);
+  },[query])
 
+  useEffect(()=>{
+    const newTime =new Date();
 
+    const throttleTimer = setTimeout(()=>{
+      console.log("검색 쿼리:", throttleQuery);
+      setThrottleSearchString(throttleQuery);
+      throttleTime.current = new Date();
+    }, 1000 - (newTime - throttleTime.current))
+
+    return () => clearTimeout(throttleTimer);
+  },[throttleQuery])
 
   return (
     <div className="container">
@@ -32,7 +48,7 @@ function App() {
         <input
           type="text"
           placeholder="Debounce를 이용한 검색..."
-          onChange={handleChange}
+          onChange={handleChangeDebound}
         />
       </div>
       <div>
@@ -40,11 +56,11 @@ function App() {
         <input
           type="text"
           placeholder="Throttle을 이용한 검색..."
-          onChange={handleChange}
+          onChange={handleChangeThrottle}
         />
       </div>
       <p>{deboundSearchString}</p>
-      <p>{throtleSearchString}</p>
+      <p>{throttleSearchString}</p>
 
     </div>
   );
